@@ -16,9 +16,9 @@ public class KaijuController : MonoBehaviour {
     [SerializeField] Transform spawnPosition;
     [SerializeField] GameObject fireBallPrefab;
     [SerializeField] float farballSpeed;
-    public Transform target;
+    public GameObject target;
     float updatePositionTimer = 0;
-
+    [SerializeField] float shootFireRate = 3;
     bool updateNewPosition = true;
 
     NavMeshAgent agent;
@@ -44,8 +44,8 @@ public class KaijuController : MonoBehaviour {
             {
                 
                 updateNewPosition = false;
-                target = n.transform;
-                lookat.LookAt(target);
+                target = n.gameObject;
+                lookat.LookAt(target.transform);
                 agent.SetDestination(n.gameObject.transform.position);
             }
             
@@ -108,18 +108,18 @@ public class KaijuController : MonoBehaviour {
                 spawnFireBall();
             }
 
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(shootFireRate);
         }
 
     }
 
     void spawnFireBall()
     {
-        Vector3 dir = target.position - spawnPosition.position;
+        Vector3 dir = target.transform.position - spawnPosition.position;
         Quaternion fireAtRotation = Quaternion.LookRotation(dir);
         GameObject train = Instantiate(fireBallPrefab, spawnPosition.position, fireAtRotation);
 
-        train.GetComponent<Rigidbody>().AddForce(dir * farballSpeed);
+        train.GetComponent<Rigidbody>().AddForce((dir + (target.GetComponent<Rigidbody>().velocity)) * farballSpeed);
     }
 
 

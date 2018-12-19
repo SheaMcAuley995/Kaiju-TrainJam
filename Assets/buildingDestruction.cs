@@ -4,13 +4,38 @@ using UnityEngine;
 
 public class buildingDestruction : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public ParticleSystem particleSystem;
+    public Transform playPosition;
+    public Transform endPosition;
+    public float health = 100f;
+
+    private void Start()
+    {
+        if(playPosition == null)
+        {
+            playPosition = transform;
+        }
+        endPosition.position = -transform.up * 10;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        health -= amount;
+        if (health <= 0f)
+        {
+            StartCoroutine("Die");
+        }
+    }
+
+    IEnumerator Die()
+    {
+        while(true)
+        {
+            particleSystem.transform.position = transform.position;
+            particleSystem.Play();
+            transform.position = Vector3.Lerp(transform.position, endPosition.position, Time.deltaTime);
+            yield return new WaitForSeconds(3);
+            Destroy(gameObject);
+        }
+    }
 }

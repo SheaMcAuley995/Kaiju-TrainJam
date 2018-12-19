@@ -11,10 +11,14 @@ public class Gun : MonoBehaviour {
     public Transform spawnPosition;
 
     [SerializeField] GameObject trainPrefab;
+    [SerializeField] float fireRate = 15f;
+    float nextTimeToFire = 0f;
+
     // Update is called once per frame
     void Update () {
-		if(Input.GetButtonDown("Fire1"))
+		if(Input.GetButtonDown("Fire1") && Time.time >= nextTimeToFire)
         {
+            nextTimeToFire = Time.time + 1f / fireRate;
             spawnTrain();
         }
 	}
@@ -22,11 +26,11 @@ public class Gun : MonoBehaviour {
 
     void spawnTrain()
     {
-        Vector3 dir =  fpsCam.transform.forward - spawnPosition.position;
+        Vector3 dir = ShootPosition() - spawnPosition.position;
         Quaternion fireAtRotation = Quaternion.LookRotation(dir);
-        GameObject train = Instantiate(trainPrefab, spawnPosition.position, Quaternion.identity);
+        GameObject train = Instantiate(trainPrefab, spawnPosition.position, fireAtRotation);
 
-        train.GetComponent<Rigidbody>().AddForce(dir * fireSpeed);
+        train.GetComponent<Rigidbody>().AddForce(dir.normalized * fireSpeed);
     }
 
     Vector3 ShootPosition()
@@ -38,8 +42,8 @@ public class Gun : MonoBehaviour {
         }
         else
         {
-            Debug.DrawLine(transform.position, transform.position + transform.forward);
-            return spawnPosition.forward * 2;
+            Debug.DrawLine(transform.position, transform.position + fpsCam.transform.forward * 10);
+            return transform.position + fpsCam.transform.forward * 10;
         }
     }
 
